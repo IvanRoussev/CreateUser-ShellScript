@@ -1,0 +1,135 @@
+#!/bin/bash
+#: Title       : script1_newUser
+#: Date        : Feb 22 2022
+#: Author      : Ivan
+#: Version     : 1.0
+#: Description : new User script Creates new user
+#: Options     : Read HelpFunc
+
+#Asks User what their User name will be
+read -p "If you would like to create User Enter UserName. IF NOT pres enter:   " USER
+
+#looks into /etc/passwd file and finds biggest number that is smaller than 60000 then adds one for the UID
+
+uid=$(awk -F":" 'BEGIN{max=0}{if(($3)>=1000 && $3<=60000)  max=$3}END {print max + 1}' /etc/passwd)
+
+echo "Generated UID is: ${uid}"
+
+
+
+
+addpasswd () {
+echo "$USER":x:"$uid":"$uid":comment:/home/"$USER":/bin/bash >> /etc/passwd 
+}
+
+groupAdd () {
+echo "$USER":x:"$uid:" >> /etc/group 
+}
+
+createHome () {
+mkdir /home/$USER
+}
+
+shadow () {
+echo "$USER":!:0:0:60:0:0:0:0 >> /etc/shadow
+}
+
+
+helpfunc () {
+echo "If you would like to create a user use the -b option when running script"
+echo "ENSURE YOU FOLLOW ALL PROMPTS"
+}
+
+
+
+#Add User to /etc/passd file 
+#addpasswd
+
+
+#ADD User to /etc/group file
+#groupAdd
+
+#Add User to /etc/shadow file
+#shadow
+
+#Makes Password for User prompt user for password
+#passwd "$USER"
+
+#Create Home directory for User
+#createHome
+
+while getopts ":hb" opt; do
+  case "${opt}" in
+    h)
+      helpfunc
+      ;;
+    b)
+      addpasswd
+      groupAdd
+      shadow
+      passwd "$USER"
+      createHome
+      ;;
+    :)
+      echo "Error: -${OPTARG} requires an argument"
+      exit 1
+      ;;
+    "?")
+      exit 1
+      ;;
+  esac
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#GLOBAL Variables $USER and $NUM
+# $USER is the username and $NUM is the UUID
+# Will get these inputs by using READ to receive input when script is run
+
+
+# FUNC 1: Check if $USER and $NUM are unique in file using "grep" /etc/passwd (IF/ELSE) if not ask user again for input using "READ". Append all information into /etc/passwd file using command:  suod printf "$USER:x:$NUM:$NUM:$USER:/home/$USER:/bin/bash" >> sudo /etc/passwd
+
+#FUNC 2: Apend all same USER and NUM values into /etc/group using commnadL sudo printf "$USER:x:$NUM:
+
+
+#FUNC 3: Check if USER already has a password using IF and Else statement. IF not assign password to the Account created by using folllowing command, 
+#passwd $USER
+
+#FUNC 4: Creates home directory command: mkdir /home/$USER, then chown $USER:$USER /home/$USER
+
+
+# Some brain storming and practice below that is similar to what will be in final script.
+
+
+
+#SOME planning/practice
+#cd "/etc/"
+
+#USER="$1"
+#NUM="$2"
+#FILE="/etc/passwd"
+
+
+#sudo printf "\n$USER:x:$NUM:$NUM:$USER:/home/$USER:/bin/bash" >> testing
+
+
+#cd "/etc/"
+
+#sudo printf "\n$USER:x:$NUM:" >> testing
+
+#passwd $USER
+#echo "Input a password"
+
+
+
